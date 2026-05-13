@@ -37,7 +37,7 @@ def get_japan_born_players(season: int) -> dict[int, str]:
 def get_schedule(game_date: date) -> list[dict]:
     resp = requests.get(
         f"{MLB_API_BASE}/schedule",
-        params={"sportId": 1, "date": game_date.isoformat(), "gameType": "R"},
+        params={"sportId": 1, "date": game_date.isoformat(), "gameType": "R", "hydrate": "team"},
         timeout=30,
     )
     resp.raise_for_status()
@@ -131,8 +131,9 @@ def collect_stats(games: list[dict], jp_ids: set[int]) -> list[dict]:
 
         game_pk = game["gamePk"]
         t = game["teams"]
-        away_abbr = t["away"]["team"]["abbreviation"]
-        home_abbr = t["home"]["team"]["abbreviation"]
+        away_abbr = t["away"]["team"].get("abbreviation") or t["away"]["team"].get("name", "???")
+        home_abbr = t["home"]["team"].get("abbreviation") or t["home"]["team"].get("name", "???")
+
         away_score = t["away"].get("score", 0)
         home_score = t["home"].get("score", 0)
         score_line = f"{away_abbr} {away_score}-{home_score} {home_abbr}"
