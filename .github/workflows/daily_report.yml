@@ -1,0 +1,27 @@
+name: MLB日本人選手 日次レポート
+
+on:
+  schedule:
+    # 毎日 22:00 UTC = 翌朝 07:00 JST
+    - cron: '0 22 * * *'
+  workflow_dispatch: # GitHubの画面から手動実行も可能
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 依存パッケージのインストール
+        run: pip install -r requirements.txt
+
+      - name: MLBレポート送信
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: python mlb_report.py
