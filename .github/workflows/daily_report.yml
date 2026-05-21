@@ -2,8 +2,8 @@ name: MLB日本人選手 日次レポート
 
 on:
   schedule:
-    # 毎日 22:00 UTC = 翌朝 07:00 JST
-    - cron: '0 22 * * *'
+    - cron: '0 0 * * *'   # 毎日 00:00 UTC = 09:00 JST（朝の速報）
+    - cron: '0 5 * * *'   # 毎日 05:00 UTC = 14:00 JST（午後の確定版）
   workflow_dispatch: # GitHubの画面から手動実行も可能
 
 jobs:
@@ -24,4 +24,5 @@ jobs:
         env:
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          REPORT_SLOT: ${{ (github.event.schedule == '0 5 * * *') && 'afternoon' || 'morning' }}
         run: python mlb_report.py

@@ -177,8 +177,9 @@ def collect_stats(games: list[dict], jp_ids: set[int]) -> list[dict]:
     return results
 
 
-def build_message(game_date: date, stats: list[dict], ja_names: dict[str, str]) -> str:
-    header = f"⚾ MLB日本人選手成績\n{game_date.year}/{game_date.month}/{game_date.day} (現地時間)\n{SEPARATOR}"
+def build_message(game_date: date, stats: list[dict], ja_names: dict[str, str], slot: str = "morning") -> str:
+    slot_label = "朝の速報" if slot == "morning" else "午後の確定版"
+    header = f"⚾ MLB日本人選手成績【{slot_label}】\n{game_date.year}/{game_date.month}/{game_date.day} (現地時間)\n{SEPARATOR}"
 
     if not stats:
         return header + "\nこの日は日本人選手の出場試合がありませんでした。"
@@ -216,10 +217,12 @@ def send_line(token: str, user_id: str, message: str) -> None:
 def main() -> None:
     token = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
     user_id = os.environ["LINE_USER_ID"]
+    slot = os.environ.get("REPORT_SLOT", "morning")
 
     game_date = date.today() - timedelta(days=1)
     season = game_date.year
 
+    print(f"実行スロット：{slot}")
     print(f"対象日：{game_date}")
 
     jp_players = get_japan_born_players(season)
@@ -232,7 +235,7 @@ def main() -> None:
     print(f"出場した日本人選手：{len(stats)}名")
 
     ja_names = load_ja_names()
-    message = build_message(game_date, stats, ja_names)
+    message = build_message(game_date, stats, ja_names, slot)
 
     print("\n--- 送信内容プレビュー ---")
     print(message)
