@@ -1,10 +1,7 @@
 name: MLB日本人選手 日次レポート
 
 on:
-  schedule:
-    - cron: '0 0 * * *'   # 毎日 00:00 UTC = 09:00 JST（朝の速報）
-    - cron: '0 5 * * *'   # 毎日 05:00 UTC = 14:00 JST（午後の確定版）
-  workflow_dispatch: # GitHubの画面から手動実行も可能
+  workflow_dispatch: # GitHubの画面から手動実行のみ（自動送信は廃止）
 
 jobs:
   report:
